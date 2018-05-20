@@ -5,133 +5,9 @@
    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
    <title>Bitmovin V7 Player (DASH / HLS / MP4)</title>
    <script src="https://bitmovin-a.akamaihd.net/bitmovin-player/stable/7/bitmovinplayer.js"></script>
-   <!-- Bitmovin player UI-->
-   <style>
-        body {
-          margin: 0;
-          padding: 0;
-          font-family: 'Open Sans', sans-serif;
-          color: #fff;
-          font-weight: 300;
-        }
-      
-        body {
-          background: rgba(44, 131, 185, 1);
-          background: -moz-linear-gradient(left, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-          background: -webkit-gradient(left top, right top, color-stop(0%, rgba(44, 131, 185, 1)), color-stop(100%, rgba(30, 171, 227, 1)));
-          background: -webkit-linear-gradient(left, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-          background: -o-linear-gradient(left, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-          background: -ms-linear-gradient(left, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-          background: linear-gradient(to right, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-          filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2c83b9', endColorstr='#1eabe3', GradientType=1);
-        }
-      
-        #wrapper {
-          height: 100vh;
-        }
-      
-      
-        #banner {
-          border-bottom: 1px solid #fff;
-          background-color: #1eabe3;
-          width: 100%
-        }
-      
-        #banner h1 {
-          margin: 0;
-          padding: 30px;
-        }
-      
-        .logo {
-          padding: 10px;
-          width: 25%;
-          min-width: 350px;
-          float: left;
-          margin: auto;
-        }
-      
-        .title {
-          width: 75%;
-          white-space: nowrap;
-        }
-      
-        .clear {
-          clear: both;
-        }
-      
-        .content {
-          margin-bottom: 10em;
-        }
-      
-        h1, h2, h3, p {
-          font-weight: 300;
-          text-align: center;
-          margin: 40px;
-        }
-      
-        #webserver-warning {
-          border: 1px solid #fff;
-          padding: 10px;
-          width: 70%;
-          margin: auto;
-          font-weight: 400;
-          font-size: 0.8em;
-          background: #f69c2a;
-        }
-      
-        #webserver-warning h1, #webserver-warning h2 {
-          font-weight: 400;
-        }
-      
-        .player-wrapper{
-            margin: auto;
-            width:1250px;
-            height:240px;
-            padding:10px;
-        }
-        .player-wrapper > div{
-            float:right;
-            margin:10px;
-        }
-        #player1{
-            width:600px;
-            -webkit-box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
-            -moz-box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
-            box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
-          
-        }
-
-        #player2{
-            width:600px;
-            -webkit-box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
-            -moz-box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
-            box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
-        }
-
-        a {
-          color: #97d9ef;
-          font-weight: 400;
-          text-decoration: none;
-        }
-      
-        a:hover {
-          color: #fff;
-        }
-      
-        @media (max-width: 800px) {
-          .logo {
-            width: 100%;
-          }
-      
-          .title {
-            display: none;
-          }
-        }
-
-        </style>
+   <link rel="stylesheet" href="./css/styles.css">
 </head>
 <body>
-<!-- <div id="unique-player-id"></div> -->
 <div id="wrapper">
         <div id="banner">
             <div class="logo"><img src="images/bitmovin-logo.png"></div>
@@ -143,25 +19,36 @@
                     <h2>Multi-Codec Support H.264/HEVC/VP9</h1>
                     <div class="content">
                         <div class="player-wrapper">
-                            <div id="player1"><div class="title"><h4>H.264/AVC</h4></div></div>
-                            <div id="player2"><div class="title"><h4>VP9</h4></div></div>
+                            <!-- dynamic text by js -->
+                            <div class="title"><h4>H.264/AVC</h4><div id="player1"></div></div>
+                            <div class="title"><h4>VP9</h4><div id="player2"></div></div>
                         </div>
                     </div>
             </div>    
 </div>
 
 <script type="text/javascript">
-   var player = bitmovin.player("player1");
-   var conf = {
-      key: "3c40c5d4-5107-4df0-92a9-b4dce564aeb5",
-      source: {
-                dash: 'https://bitmovin-a.akamaihd.net/content/multi-codec/h264/stream.mpd',
-                hls: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
-                progressive: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
- 
-      }
-   };
+    // Browser detectioin
+    // Chrome 1+
+    var isChrome = !!window.chrome && !!window.chrome.webstore;
+    // Firefox 1.0+
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    
+    var player = bitmovin.player("player1");
+    var conf = {
+        key: "3c40c5d4-5107-4df0-92a9-b4dce564aeb5",
+        playback: {
+            autoplay: true,
+            muted: true
+        },
+        source: {
+                  dash: 'https://bitmovin-a.akamaihd.net/content/multi-codec/h264/stream.mpd',
+                  hls: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+                  progressive: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
   
+        },
+    };
+    
    player.setup(conf).then(function (value) {
        console.log("Successfully created bitmovin player1 instance");
    }, function (reason) {
@@ -170,10 +57,24 @@
 </script>
 <script type="text/javascript">
     var player = bitmovin.player("player2");
+    var vp9 = 'http://bitmovin-a.akamaihd.net/content/multi-codec/vp9/stream.mpd';
+    var hvec = 'http://bitmovin-a.akamaihd.net/content/dataset/multi-codec/hevc/stream.mpd';
+    var defaultDash = 'http://bitdash-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd';
+    if (isChrome) {
+      condecSource = vp9;
+    } else if (isFirefox) {
+      condecSource = hvec;
+    } else {
+      condecSource = defaultDash;
+    }
     var conf = {
        key: "3c40c5d4-5107-4df0-92a9-b4dce564aeb5",
+       playback: {
+            autoplay: true,
+            muted: true
+        },
        source: {
-                 dash: 'https://bitmovin-a.akamaihd.net/content/multi-codec/vp9/stream.mpd',
+                 dash: condecSource,
                  hls: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
                  progressive: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
   
