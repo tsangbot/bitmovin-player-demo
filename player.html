@@ -28,12 +28,13 @@
 </div>
 
 <script type="text/javascript">
-    // Browser detectioin
+    // Browser detection
     // Chrome 1+
     var isChrome = !!window.chrome && !!window.chrome.webstore;
     // Firefox 1.0+
     var isFirefox = typeof InstallTrigger !== 'undefined';
-    
+    // Safari
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
     var player = bitmovin.player("player1");
     var conf = {
         key: "3c40c5d4-5107-4df0-92a9-b4dce564aeb5",
@@ -60,14 +61,18 @@
     var vp9 = 'http://bitmovin-a.akamaihd.net/content/multi-codec/vp9/stream.mpd';
     var hvec = 'http://bitmovin-a.akamaihd.net/content/dataset/multi-codec/hevc/stream.mpd';
     var defaultDash = 'http://bitdash-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd';
+    
     if (isChrome) {
-      condecSource = vp9;
+        condecSource = vp9;
     } else if (isFirefox) {
-      condecSource = hvec;
-      document.getElementsByTagName("h4")[1].innerHTML = "H.265/HVEC";
+        condecSource = vp9;
+    } else if (isSafari) {
+        condecSource = hvec;
+        document.getElementsByTagName("h4")[1].innerHTML = "H.265/HVEC";
     } else {
-      condecSource = defaultDash;
+        condecSource = defaultDash;
     }
+
     var conf = {
        key: "3c40c5d4-5107-4df0-92a9-b4dce564aeb5",
        playback: {

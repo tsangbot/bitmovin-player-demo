@@ -12,7 +12,7 @@
 -->
 <html lang="en">
 <head>
-    <title>Bitmovin Demo</title>
+    <title>Bitmovin Demo - Adversting Scheudling</title>
     <meta charset="UTF-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -26,24 +26,8 @@
             margin: 0;
             padding: 0;
             font-family: 'Open Sans', sans-serif;
-            color: #fff;
+            color: #000;
             font-weight: 300;
-        }
-
-        body {
-            background: rgba(44, 131, 185, 1);
-            background: -moz-linear-gradient(left, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-            background: -webkit-gradient(left top, right top, color-stop(0%, rgba(44, 131, 185, 1)), color-stop(100%, rgba(30, 171, 227, 1)));
-            background: -webkit-linear-gradient(left, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-            background: -o-linear-gradient(left, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-            background: -ms-linear-gradient(left, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-            background: linear-gradient(to right, rgba(44, 131, 185, 1) 0%, rgba(30, 171, 227, 1) 100%);
-            filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#2c83b9', endColorstr='#1eabe3', GradientType=1);
-        }
-
-        #wrapper {
-            background: url(images/logo-bg-demopage.png);
-            height: 100vh;
         }
 
         #banner {
@@ -55,6 +39,7 @@
         #banner h1 {
             margin: 0;
             padding: 30px;
+            color: #fff;
         }
 
         .logo {
@@ -119,12 +104,18 @@
 
         @media (max-width: 800px) {
             .logo {
-                width: 100%;
+                width: 80%;
             }
 
             .title {
                 display: none;
             }
+        }
+
+        .col-sm-6.mb-3,.col-md-12 {
+            margin: auto;
+            width: 40%;
+            padding: 5px;
         }
     </style>
 </head>
@@ -132,12 +123,45 @@
 <div id="wrapper">
     <div id="banner">
         <div class="logo"><img src="images/bitmovin-logo.png"></div>
-        <div class="title"><h1>Bitmovin HTML5 Player</h1></div>
+        <div class="title"><h1>Bitmovin Demo - Ad Scheduling</h1></div>
         <div class="clear"></div>
     </div>
     <div class="container">
-        <h1>HTML5 Adaptive Streaming Player for MPEG-DASH & HLS</h1>
-        <h2>Your videos play everywhere with low startup delay, no buffering and in highest quality.</h2>
+        <h2>This demonstration covers Bitmovin Player’s ad insertion capabilities.</h2> 
+        <p>By using Bitmovin Player's API, one could freely schedule ads in different position. </br>
+        Bitmovin player supports playback of different advertising standards, includes VAST, VPAID, IMA and VMAP.</br>
+        Try it for yourself, select the desired position and Ad standards then hit Schedule AD. To clear, hit Reset Configuration</p>    
+        <div class="controls">
+                <div class="row">
+                    <div class="col-sm-6 mb-3">
+                        <select id="adType" class="form-control">
+                            <option selected="selected" value="vast">VAST</option>
+                            <option value="vpaid">VPAID</option>
+                            <option value="vmap">VMAP</option>
+                            <option value="ima">IMA</option>
+                        </select>
+                        <select id="schedule-list" class="form-control">
+                                <option selected="selected" value="pre">Ad position : pre-roll (0%)</option>
+                                <option value="5%">Ad position : mid-roll(5%)</option>
+                                <option value="10%">Ad position : mid-roll(10%)</option>
+                                <option value="post">Ad position : post-roll (100%)</option>
+                        </select>
+                        <input id="scheudle-ad-button" class="btn btn-success mr-3 mt-2" type="button" value="Schedule AD">
+                        <input id="reset-button" class="btn btn-warning mt-2" type="button" value="Reset Configuration">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-12">
+                    <div id="ad-error"></div>
+                </div>
+                <div class="col-md-12">
+                    <div id="ad-warning"></div>
+                </div>
+            </div>
+            
+        <br/><br/>
         <div class="content">
             <div class="player-wrapper">
                 <div id="player"></div>
@@ -149,6 +173,7 @@
         </div>
     </div>
 </div>
+
 <script type="text/javascript">
 
     if (location.protocol === 'file:') {
@@ -159,33 +184,31 @@
 
     var conf = {
         key: '3c40c5d4-5107-4df0-92a9-b4dce564aeb5',
+        playback: {
+            muted: true
+        },
         source: {
             dash: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
             hls: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
             progressive: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
             poster: 'https://bitdash-a.akamaihd.net/content/MI201109210084_1/poster.jpg'
         },
-        advertising: {
-                admessage: 'This ad will end in {remainingTime} seconds',
-                skipmessage: {
-                    countdown: 'Skip in {remainingTime} seconds...',
-                    skip: 'SKIP'
-                },
-                schedule: {
-                'pre-roll-ad': {
-                    client: 'vpaid',
-                    offset: 'pre',
-                    tag: 'https://pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/32573358/skippable_ad_unit&' +
-                    'impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&url=[referrer_url]' +
-                    '&description_url=[description_url]&correlator=[timestamp]'
-                }
-            }
-        },
         style: {
             width: '100%',
             aspectratio: '16:9'
+        },
+        events: {
+            onAdError: function (err) {
+            document.querySelector('#ad-error').innerHTML = 'Ad-Error:' + err.message;
+            },
+            onWarning: function (err) {
+            document.querySelector('#ad-warning').innerHTML = err.message;
+            }
         }
     };
+
+    document.querySelector('#scheudle-ad-button').addEventListener('click', loadConfig);
+    document.querySelector('#reset-button').addEventListener('click', removeSchedule);
 
     player = bitmovin.player("player");
 
@@ -194,6 +217,79 @@
     }, function (reason) {
         console.log('Error while creating Bitmovin Player instance'); // Error!
     });
+
+
+
+function resetAdError() {
+  document.querySelector('#ad-error').innerHTML = '';
+}
+
+function loadConfig() {
+  resetAdError();
+  var adType = document.getElementById('adType').value || 'vast';
+  var schedule = document.getElementById('schedule-list').value;
+  if (schedule) {
+      switch (adType) {
+        case 'ima': {
+          manifestUrl = '//pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/single_ad_samples&ciu_szs=300x250&impl=s&gdfp_req=1&env=vp&output=vast&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ct%3Dlinear&correlator=[random]';
+          break;
+        }
+        case 'vmap': {
+          manifestUrl = '//pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/124319096/external/ad_rule_samples&ciu_szs=300x250&ad_rule=1&impl=s&gdfp_req=1&env=vp&output=vmap&unviewed_position_start=1&cust_params=deployment%3Ddevsite%26sample_ar%3Dpreonly&cmsid=496&vid=short_onecue&correlator=[random]';
+          break;
+        }
+        case 'vpaid': {
+          // same as VAST
+          manifestUrl = '//pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/32573358/skippable_ad_unit&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=http%3A%2F%2Freleasetest.dash-player.com%2Fads%2F&description_url=[description_url]&correlator=[random]';
+          break;
+        }
+        default: {
+          // reset to VAST
+          manifestUrl = '//pubads.g.doubleclick.net/gampad/ads?sz=640x480&iu=/32573358/skippable_ad_unit&impl=s&gdfp_req=1&env=vp&output=xml_vast2&unviewed_position_start=1&url=http%3A%2F%2Freleasetest.dash-player.com%2Fads%2F&description_url=[description_url]&correlator=[random]';
+          document.getElementById('adType').value = 'vast';
+        }
+      }
+    
+    // vmap is handled as ima tag
+    if (adType === 'vmap') {
+      adType = 'ima';
+    }
+    player.scheduleAd(manifestUrl, adType, {
+      'timeOffset': document.getElementById('schedule-list').value,
+      'pertistant': true,
+      'adMessage': 'This ad will end in {remainingTime} seconds'
+    });
+  }
+  player.play();
+}
+
+function removeSchedule() {
+  resetAdError();
+  player.destroy();
+  player = bitmovin.player('player');
+  player.setup({
+    key: '23c40c5d4-5107-4df0-92a9-b4dce564aeb5',
+    playback: {
+        muted: true
+    },
+    source: {
+      dash: '//bitmovin-a.akamaihd.net/content/MI201109210084_1/mpds/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.mpd',
+      hls: '//bitmovin-a.akamaihd.net/content/MI201109210084_1/m3u8s/f08e80da-bf1d-4e3d-8899-f0f6155f6efa.m3u8',
+      progressive: '//bitmovin-a.akamaihd.net/content/MI201109210084_1/MI201109210084_mpeg-4_hd_high_1080p25_10mbits.mp4',
+      poster: '//bitmovin-a.akamaihd.net/content/art-of-motion_drm/art-of-motion_poster.jpg'
+    },
+    events: {
+      onAdError: function (err) {
+        document.querySelector('#ad-error').innerHTML = 'Ad-Error:' + err.message;
+      },
+      onWarning: function (err) {
+        document.querySelector('#ad-warning').innerHTML = err.message;
+      }
+    }
+  });
+}
+
+
 </script>
 </body>
 </html>
