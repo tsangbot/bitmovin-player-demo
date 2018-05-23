@@ -7,12 +7,6 @@
   font-weight: 300;
 }
 
-
-#wrapper {
-  height: 100vh;
-}
-
-
 #banner {
   border-bottom: 1px solid #fff;
   background-color: #1eabe3;
@@ -34,7 +28,7 @@
 }
 
 .title {
-  width: 600px;
+  width: 75%;
   white-space: nowrap;
 }
 
@@ -76,6 +70,16 @@ h1, h2, h3, p {
     float:right;
     margin:10px;
 }
+
+#player {
+  max-width: 900px;
+  width: 90%;
+  margin: auto;
+  -webkit-box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
+  box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
+}
+
 #player1{
     -webkit-box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
     -moz-box-shadow: 0px 0px 56px 0px rgba(0, 0, 0, 0.75);
@@ -107,4 +111,14 @@ a:hover {
   .title {
     display: none;
   }
+}
+
+#wrapper {
+  height: 100vh;
+}
+
+.col-sm-6.mb-3,.col-md-12 {
+  margin: auto;
+  width: 40%;
+  padding: 5px;
 }
