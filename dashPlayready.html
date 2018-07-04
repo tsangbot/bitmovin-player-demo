@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Bitmovin V7 Player (DASH / HLS / MP4)</title>
+    <script src="https://bitmovin-a.akamaihd.net/bitmovin-player/stable/7/bitmovinplayer.js"></script>
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+<div id="wrapper">
+    <div id="banner">
+        <div class="logo"><img src="images/bitmovin-logo.png"></div>
+        <div class="title"><h1>Bitmovin HTML5 Player</h1></div>
+        <div class="clear"></div>
+    </div>
+
+    <div class="container">
+        <h1>DASH Playready</h1>
+        <div class="content">
+            <div class="player-wrapper">
+                <!-- dynamic text by js -->
+                <div class="title"><h4>DAZN Test Asset</h4>
+                    <div id="player1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="js/b64.js"></script>
+<script type="text/javascript">
+    // Browser detection
+    // Chrome 1+
+    var isChrome = !!window.chrome && !!window.chrome.webstore;
+    // Firefox 1.0+
+    var isFirefox = typeof InstallTrigger !== 'undefined';
+    // Safari
+    var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) {
+        return p.toString() === "[object SafariRemoteNotification]";
+    })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+    var player = bitmovin.player("player1");
+    var conf = {
+        key: "e3eea794-f9b8-443b-a84a-76b61029bb14",
+        playback: {
+            autoplay: true,
+            muted: true
+        },
+        source: {
+            dash: 'https://m2a-dazntest-cache-dc3.m2amedia.services/live/channel/9004/all/stream.mpd',
+            hls: 'https://devdc1livededazn-a.akamaihd.net/out/u/encr_15231490666_5acf0afd1ee3445e977b1608803b1afa.m3u8?dach=true',
+            drm: {
+                widevine: {
+                    LA_URL: 'https://widevine.entitlement.theplatform.eu/wv/web/ModularDrm?form=json&schema=1.0&token=eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJwZ2xzLWRldmQtdHJzdGQvQnJpYW5UZXN0IiwiaXNzIjoiMSIsImV4cCI6MTUzMDg3NTY1MiwiaWF0IjoxNTMwNzAyODUyMzU0LCJqdGkiOiJjNGY2OTQwYy0wZTkwLTQ4NzgtYWJmNy1iYmYwNDlhNWMzY2MiLCJkaWQiOiJwZ2xzLWRldmQtdHJzdGQiLCJ1bm0iOiJCcmlhblRlc3QiLCJjdHgiOiJ7XCJhdHRyaWJ1dGVzXCI6e1wic3Vic2NyaXB0aW9uTGV2ZWxcIjpcInN0YW5kYXJkXCJ9LFwidXNlck5hbWVcIjpcIkJyaWFuVGVzdFwifVxuIiwib2lkIjpudWxsfQ.aQ9NtqELdxcOOhKoWIBrcuq7qPt2gwcaH3pvcIhXxRdkeRVs3JxrUh3hXqQrPMw9Wbg5BaOzrfTbXRLJ9Y2cdSqZNWYbgaXjr2JmgJFCv1ERIl9U-6dqmg1SObPx0puggAOEj8GywEDlbvg_IzqIss3ge38nQDFmsnAEnQmuMC7rTUbWmo_Ll9dzD8BOvsMvMHAmwnZKzNijBg5_MFnv8zKM64dzMqQ7BOr7mj0QjkuL4v1H3MBKOxXMK8XnN4Tv3_hv1iAfDUbGIn_i8np9bn8FeMU5pfzfGTtJxTtxPISF0XyiENAPi_lM_GLHvX6mS-T9bqY_tHfUiVgWCEX5eA&_releasePid=Ct_ZTTn84g3d&account=http://access.auth.theplatform.com/data/Account/2699870361&cid=BrianTestWidevine',
+                    prepareMessage: function (keyMessage) {
+                        return JSON.stringify({
+                            getWidevineLicense: {
+                                releasePid: 'Ct_ZTTn84g3d',
+                                widevineChallenge: window.btoa(String.fromCharCode.apply(null, new Uint8Array(keyMessage.message)))
+                            }
+                        });
+                    },
+                    prepareLicense: function(licenseObj){
+                        var license = {license: licenseObj.license};
+
+                        try {
+                            var tpDRMObj = JSON.parse(String.fromCharCode.apply(null, new Uint8Array (licenseObj.license)));
+                            if (tpDRMObj !== null && tpDRMObj.license !== null) {
+                                    console.log('Got Widevine license!');
+
+                                var licenseString = tpDRMObj['getWidevineLicenseResponse']['license'];
+                                console.log('Widevine license:', licenseString);
+                                license.license = new Uint8Array(BASE64.decodeArray(licenseString));
+                            } else {
+                                // no valid license
+                                console.log('Did not get Widevine Modular license.  Response was:', JSON.stringify(tpDRMObj, null, 4));
+                                return null;
+                            }
+                        } catch (e) {
+                            // no valid DRMtoday license
+                        }
+                        return license;
+
+
+                    }
+                },
+                playready: {
+                    LA_URL: 'https://green.playready.entitlement.theplatform.eu/playready/rightsmanager.asmx?schema=1.0&auth=eyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJwZ2xzLWRldmQtdHJzdGQvQnJpYW5UZXN0IiwiaXNzIjoiMSIsImV4cCI6MTUzMDg4MzY0MSwiaWF0IjoxNTMwNzEwODQxODg4LCJqdGkiOiJiNDBjOGY4YS0xNzRjLTRiOGItYmU5Yy00YjdiYzY0M2NmMzEiLCJkaWQiOiJwZ2xzLWRldmQtdHJzdGQiLCJ1bm0iOiJCcmlhblRlc3QiLCJjdHgiOiJ7XCJhdHRyaWJ1dGVzXCI6e1wic3Vic2NyaXB0aW9uTGV2ZWxcIjpcInN0YW5kYXJkXCJ9LFwidXNlck5hbWVcIjpcIkJyaWFuVGVzdFwifVxuIiwib2lkIjpudWxsfQ.F6HBlBsu8YfLi4Yem9SIackuPiAtcPSixHCslaWm5Z30h7_gIv2T6LNNO81kD2Wj26GIsbvlwjY06CEca2MKEd5tp1jRG9qrkjnEwPZzWU0ZMaMDWYuoAPFBmId4hhMn1Rkq6QrFj9CNsqTeB8ZgN0_ihYixWaIgC-FDFRNFT018MrjZGJ7Cl7r9Z6K7V22a-tswsMTXuMbkvKgNEaffyiJ-5O3MxuKlhe70nfdGCe-nfFOLpEYUYz4C_WYBXvc-PqMqWNjmzZ93iIyvE_t337tmf6PZX9UDwcuK1vb9E7dE-slcJgG2BUMLsPpOd5N6N2lb0aZRyurBpq0uLKb62w&releasePid=9l0F_EUzBhFW&account=http://access.auth.theplatform.com/data/Account/2699870361'
+                },
+                fairplay: {
+                    LA_URL: 'https://fairplay.entitlement.theplatform.eu/fpls/web/FairPlay?schema=1.0&httpError=false&form=json&token=eeyJhbGciOiJSUzUxMiJ9.eyJzdWIiOiJwZ2xzLWRldmQtdHJzdGQvQnJpYW5UZXN0IiwiaXNzIjoiMSIsImV4cCI6MTUzMDg4ODEyNiwiaWF0IjoxNTMwNzE1MzI2Njk1LCJqdGkiOiI0NDkwNDIyMy1lYjc0LTRmNGEtODY4YS04MTY4NWY2MTZlMWUiLCJkaWQiOiJwZ2xzLWRldmQtdHJzdGQiLCJ1bm0iOiJCcmlhblRlc3QiLCJjdHgiOiJ7XCJhdHRyaWJ1dGVzXCI6e1wic3Vic2NyaXB0aW9uTGV2ZWxcIjpcInN0YW5kYXJkXCJ9LFwidXNlck5hbWVcIjpcIkJyaWFuVGVzdFwifVxuIiwib2lkIjpudWxsfQ.ruERhZuc8kztRHW8F2yKxufKD-gN3msWZkX86Qynf5TS4W5p-ro4ap-ilYwWbFj0f9xayPOTV1SNfrPB1C5nijegeX0GtX2Pem0Wq_lorGee9_v9qIecMRuK8BMIqbSwxdkkRVLLaOtQFVKAG4R_B85xLPMBB-_1bjheQnwevfZhpBv62EQbvyH89wmWWYhVbsQi3ZvQA3sM6zZ9grhmCkrudvQqpHd0q4o19Bcy0DwQR5HMY168VFx-xXcKtYsjlnko5KPLC32wnuUrKfYpVtIwTk7Kseex9NCcRremxWdq1ij8j9ZXri1Cdx1xSn_KfnzNpSPnlI2Lja_h5Q6CkA&_releasePid=8YAYADUdKUPS&account=http://access.auth.theplatform.com/data/Account/2699870361&cid=BrianTestFairplay',
+                    certificateURL: 'https://cdn.dazn.com/config/cert/fairplay.cer'
+                }
+
+            }
+        }
+    };
+
+    player.setup(conf).then(function (value) {
+        console.log("Successfully created bitmovin player1 instance");
+    }, function (reason) {
+        console.log("Error while creating bitmovin player1 instance");
+    });
+</script>
+</body>
+</html>
